@@ -30,7 +30,7 @@ import SwiftUI
 import ChuckNorrisJokesModel
 
 struct JokeCardView: View {
-  var viewModel: JokesViewModel
+  @ObservedObject var viewModel: JokesViewModel
     
   var body: some View {
     ZStack {
