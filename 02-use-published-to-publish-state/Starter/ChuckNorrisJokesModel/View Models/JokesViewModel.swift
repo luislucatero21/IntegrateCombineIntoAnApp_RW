@@ -31,58 +31,64 @@ import Combine
 import SwiftUI
 
 public final class JokesViewModel {
-  public enum DecisionState {
-    case disliked, undecided, liked
-  }
-  
-  private static let decoder = JSONDecoder()
+    public enum DecisionState {
+        case disliked, undecided, liked
+    }
 
-  //TODO: add services here
-  
-  private var subscriptions = Set<AnyCancellable>()
-  private var jokeSubscriptions = Set<AnyCancellable>()
+    private static let decoder = JSONDecoder()
 
-  public init(jokesService: JokeServiceDataPublisher? = nil,
-              translationService: TranslationServiceDataPublisher? = nil) {
+    @Published public var fetching: Bool = false
+    @Published public var joke: Joke = Joke.starter
+    @Published public var backgroundColor = Color("Gray")
+    @Published public var decisionState: DecisionState = .undecided
+    @Published public var showTranslation = false
+
+    //TODO: add services here
+
+    private var subscriptions = Set<AnyCancellable>()
+    private var jokeSubscriptions = Set<AnyCancellable>()
+
+    public init(jokesService: JokeServiceDataPublisher? = nil,
+                translationService: TranslationServiceDataPublisher? = nil) {
 
 
-  }
-  
-  public func fetchJoke() {
-    
-  }
-  
-  func fetchTranslation(for joke: Joke, to languageCode: String)
+    }
+
+    public func fetchJoke() {
+
+    }
+
+    func fetchTranslation(for joke: Joke, to languageCode: String)
     -> AnyPublisher<Joke, Never> {
-      return Empty().eraseToAnyPublisher()
-  }
-  
-  public func updateBackgroundColorForTranslation(_ translation: Double) {
-    switch translation {
-    case ...(-0.5):
-      backgroundColor = Color("Red")
-    case 0.5...:
-      backgroundColor = Color("Green")
-    default:
-      backgroundColor = Color("Gray")
+        return Empty().eraseToAnyPublisher()
     }
-  }
 
-  public func updateDecisionStateForTranslation(
-    _ translation: Double,
-    andPredictedEndLocationX x: CGFloat,
-    inBounds bounds: CGRect) {
-    switch (translation, x) {
-    case (...(-0.6), ..<0):
-      decisionState = .disliked
-    case (0.6..., bounds.width...):
-      decisionState = .liked
-    default:
-      decisionState = .undecided
+    public func updateBackgroundColorForTranslation(_ translation: Double) {
+        switch translation {
+        case ...(-0.5):
+            backgroundColor = Color("Red")
+        case 0.5...:
+            backgroundColor = Color("Green")
+        default:
+            backgroundColor = Color("Gray")
+        }
     }
-  }
-  
-  public func reset() {
-    backgroundColor = Color("Gray")
-  }
+
+    public func updateDecisionStateForTranslation(
+        _ translation: Double,
+        andPredictedEndLocationX x: CGFloat,
+        inBounds bounds: CGRect) {
+            switch (translation, x) {
+            case (...(-0.6), ..<0):
+                decisionState = .disliked
+            case (0.6..., bounds.width...):
+                decisionState = .liked
+            default:
+                decisionState = .undecided
+            }
+        }
+
+    public func reset() {
+        backgroundColor = Color("Gray")
+    }
 }
