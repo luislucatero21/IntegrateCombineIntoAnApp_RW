@@ -26,14 +26,48 @@
 /// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 /// THE SOFTWARE.
 
+import CoreData
 import SwiftUI
 
 @main
 struct ChuckNorrisJokesApp: App {
-  
-  var body: some Scene {
-    WindowGroup {
-      JokeView()
+
+    @Environment(\.scenePhase) var scenePhase
+
+    var body: some Scene {
+        WindowGroup {
+            JokeView()
+                .environment(\.managedObjectContext, CoreDataStack.viewContext)
+        }
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .background {
+                CoreDataStack.save()
+            }
+        }
     }
-  }
+}
+
+private enum CoreDataStack {
+
+    static var viewContext: NSManagedObjectContext = {
+        let container = NSPersistentContainer(name: "ChuckNorrisJokes")
+
+        container.loadPersistentStores { _, error in
+            guard error == nil else {
+                fatalError("\(#file), \(#function), \(error!.localizedDescription)")
+            }
+        }
+
+        return container.viewContext
+    }()
+
+    static func save() {
+        guard viewContext.hasChanges else { return }
+
+        do {
+            try viewContext.save()
+        } catch {
+            fatalError("\(#file), \(#function), \(error.localizedDescription)")
+        }
+    }
 }
